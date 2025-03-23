@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Achintya's French Spelling Bee Vocabulary Trainer</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      height: 100%;
+    }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .word {
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+
+    .translation {
+      font-size: 2rem;
+      color: red;
+      margin-bottom: 1rem;
+    }
+
+    #start-btn {
+      margin-bottom: 1rem;
+    }
+
+    #time {
+      font-size: 1.5rem;
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+
+    #timesup {
+      background-color: yellow;
+      padding: 1rem;
+      font-size: 2rem;
+      display: none;
+      position: relative;
+      text-align: center;
+    }
+
+    #restart-btn {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      margin-top: 10px;
+    }
+
+    .center-controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      display: none;
+    }
+
+    .bottom-checkboxes {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="time">60.0</div>
+  <div class="word" id="foreign-word">Welcome to Achintya's French Spelling Bee Vocabulary Trainer</div>
+  <div class="translation" id="translation">Built using HTML, CSS & JavaScript</div>
+  <button id="start-btn" onclick="startQuiz()">Start</button>
+  <div class="center-controls" id="control-buttons">
+    <button id="next-btn" onclick="showNextWord()">Next</button>
+    <button id="stop-btn" onclick="stopQuiz()">Stop</button>
+  </div>
+  <div class="bottom-checkboxes">
+    <label><input type="checkbox" id="stage1"> French Stage 1</label>
+    <label><input type="checkbox" id="stage2"> French Stage 2</label>
+  </div>
+  <div id="timesup">
+    <div>TIME'S UP!</div>
+  </div>
+  <button id="restart-btn" onclick="restartQuiz()" style="display: none;">Restart</button>
+
+  <script>
+    const vocabStage1 = [
+      { fr: "être", en: "to be | being" },
+      { fr: "est", en: "is" },
+      { fr: "français", en: "French" },
+      { fr: "anglais", en: "English" },
+      { fr: "petit", en: "small" },
+      { fr: "grand", en: "big" },
+      { fr: "il", en: "he" },
+      { fr: "aimer", en: "to like, love" },
+      { fr: "aime", en: "likes, loves" },
+      { fr: "et", en: "and" },
+      { fr: "elle", en: "she" },
+      { fr: "non", en: "no" },
+      { fr: "oui", en: "yes" },
+      { fr: "Bonjour!", en: "Hello!" },
+      { fr: "Salut!", en: "Hi!" },
+      { fr: "Je suis...", en: "I am, I'm..." },
+      { fr: "Et toi?", en: "And you?" },
+      { fr: "Comment dit-on...?", en: "How do you say?" },
+      { fr: "Je ne sais pas", en: "I don't know" },
+      { fr: "encore", en: "again" },
+      { fr: "Je ne comprends pas", en: "I don't understand" },
+      { fr: "faux", en: "false" },
+      { fr: "vrai", en: "true" },
+      { fr: "présent", en: "present" },
+      { fr: "triste", en: "sad" },
+      { fr: "Ça va?", en: "How is it going?" },
+      { fr: "bien", en: "well, good" },
+      { fr: "mal", en: "badly" },
+      { fr: "merci", en: "thank you" },
+      { fr: "Au revoir!", en: "Goodbye!" },
+      { fr: "mais", en: "but" },
+      { fr: "le prix", en: "price, prize" },
+      { fr: "le mot", en: "word" },
+      { fr: "la table", en: "table" },
+      { fr: "le sac", en: "bag" },
+      { fr: "content", en: "pleased, happy" },
+      { fr: "désolé", en: "sorry" },
+      { fr: "calme", en: "calm" },
+      { fr: "malade", en: "ill, sick" },
+      { fr: "jeune", en: "young" },
+      { fr: "amusant", en: "amusing, entertaining" },
+      { fr: "prochain", en: "next" },
+      { fr: "préféré", en: "favourite" },
+      { fr: "une chose", en: "a thing" },
+      { fr: "avoir", en: "to have | having" },
+      { fr: "a", en: "has" },
+      { fr: "une idée", en: "an idea" },
+      { fr: "un animal", en: "an animal" },
+      { fr: "aussi", en: "also" }
+    ];
+
+    const vocabStage2 = [
+      { fr: "un chien", en: "a dog" },
+      { fr: "la plage", en: "beach" },
+      { fr: "un portable", en: "a mobile phone" },
+      { fr: "la porte", en: "door" },
+      { fr: "ici", en: "here" },
+      { fr: "un ordinateur", en: "a computer" },
+      { fr: "une voiture", en: "a car" },
+      { fr: "rapide", en: "fast" },
+      { fr: "cher", en: "expensive" },
+      { fr: "moderne", en: "modern" },
+      { fr: "ouvert", en: "open" },
+      { fr: "que", en: "that, it" },
+      { fr: "une question", en: "a question" },
+      { fr: "un livre", en: "book" },
+      { fr: "intéressant", en: "interesting" },
+      { fr: "la vue", en: "view" },
+      { fr: "la photo", en: "photo" },
+      { fr: "gauche", en: "left" },
+      { fr: "droite", en: "right" },
+      { fr: "très", en: "very" },
+      { fr: "sur", en: "on" },
+      { fr: "un enfant", en: "a child" },
+      { fr: "maintenant", en: "now" },
+      { fr: "un homme", en: "a man" },
+      { fr: "un jour", en: "a day" },
+      { fr: "un mois", en: "a month" },
+      { fr: "un an", en: "a year" },
+      { fr: "une semaine", en: "a week" },
+      { fr: "une femme", en: "a woman" },
+      { fr: "unique", en: "only, single" },
+      { fr: "une personne", en: "a person" },
+      { fr: "le lit", en: "bed" },
+      { fr: "faire", en: "to do, doing" },
+      { fr: "fait", en: "does, is doing" },
+      { fr: "les devoirs", en: "homework" },
+      { fr: "samedi", en: "Saturday" },
+      { fr: "le voyage", en: "trip, journey" },
+      { fr: "les courses", en: "shopping" },
+      { fr: "la cuisine", en: "kitchen, cooking" },
+      { fr: "une activité", en: "activity" },
+      { fr: "sympa", en: "nice, kind" },
+      { fr: "bleu", en: "blue" },
+      { fr: "vert", en: "green" },
+      { fr: "rouge", en: "red" },
+      { fr: "blanc", en: "white" },
+      { fr: "noir", en: "black" },
+      { fr: "beau", en: "fine, beautiful" },
+      { fr: "mauvais", en: "bad" },
+      { fr: "le père", en: "father" },
+      { fr: "la mère", en: "mother" },
+      { fr: "le frère", en: "brother" },
+      { fr: "la sœur", en: "sister" },
+      { fr: "trouver", en: "to find, finding" },
+      { fr: "trouve", en: "finds, is finding" },
+      { fr: "passer", en: "to pass, spend (time)" },
+      { fr: "passe", en: "passes, spends" },
+      { fr: "donner", en: "to give, giving" },
+      { fr: "donne", en: "gives, is giving" },
+      { fr: "porter", en: "to wear, carry" },
+      { fr: "porte", en: "wears, carries" },
+      { fr: "la famille", en: "family" },
+      { fr: "mercredi", en: "Wednesday" },
+      { fr: "vendredi", en: "Friday" },
+      { fr: "une fois", en: "one time, once" },
+      { fr: "avec", en: "with" },
+      { fr: "le groupe", en: "group" },
+      { fr: "penser", en: "to think, thinking" },
+      { fr: "pense", en: "thinks, is thinking" },
+      { fr: "parler", en: "to speak, speaking" },
+      { fr: "parle", en: "speaks, is speaking" },
+      { fr: "demander", en: "to ask, asking" },
+      { fr: "demande", en: "asks, is asking" },
+      { fr: "rester", en: "to stay | staying" },
+      { fr: "reste", en: "stays | is staying" },
+      { fr: "montrer", en: "to show | showing" },
+      { fr: "montre", en: "shows | is showing" },
+      { fr: "le centre", en: "centre" },
+      { fr: "le cinéma", en: "cinema" },
+      { fr: "par exemple", en: "for example" },
+      { fr: "nous", en: "we" },
+      { fr: "regarder", en: "to watch | watching" },
+      { fr: "regarde", en: "watches | is watching" },
+      { fr: "marcher", en: "to walk | walking" },
+      { fr: "marche", en: "walks | is walking" },
+      { fr: "travailler", en: "to work | working" },
+      { fr: "travaille", en: "works | is working" },
+      { fr: "préparer", en: "to prepare | preparing" },
+      { fr: "prépare", en: "prepares | is preparing" },
+      { fr: "sans", en: "without" },
+      { fr: "le garçon", en: "boy" },
+      { fr: "la fille", en: "girl" },
+      { fr: "jouer", en: "to play | playing" },
+      { fr: "joue", en: "plays | is playing" },
+      { fr: "écouter", en: "to listen | listening" },
+      { fr: "écoute", en: "listens | is listening" },
+      { fr: "chanter", en: "to sing | singing" },
+      { fr: "chante", en: "sings | is singing" },
+      { fr: "manger", en: "to eat | eating" },
+      { fr: "mange", en: "eats | is eating" },
+      { fr: "le déjeuner", en: "lunch" }
+    ];
+
+    let activeVocab = [];
+    let timer;
+    let countdown = 60.0;
+    let startTime;
+    let currentWord = { fr: '---', en: '---' };
+
+    function startQuiz() {
+      updateActiveVocab();
+      if (activeVocab.length === 0) {
+        window.alert("ERROR: Please select at least one stage.");
+        return;
+      }
+      document.getElementById('timesup').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('control-buttons').style.display = 'flex';
+      document.getElementById('restart-btn').style.display = 'none';
+      countdown = 60.0;
+      document.getElementById('time').textContent = countdown.toFixed(1);
+      showNextWord();
+      clearInterval(timer);
+      startTime = Date.now();
+      timer = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const remaining = Math.max(60 - elapsed, 0);
+        document.getElementById('time').textContent = remaining.toFixed(1);
+        if (remaining <= 0) {
+          clearInterval(timer);
+          document.getElementById('timesup').style.display = 'block';
+          document.getElementById('restart-btn').style.display = 'inline-block';
+          document.getElementById('control-buttons').style.display = 'none';
+          playLowPitchDing();
+        }
+      }, 100);
+      playHighPitchDing();
+    }
+
+    function stopQuiz() {
+      clearInterval(timer);
+      const elapsed = (Date.now() - startTime) / 1000;
+      const remaining = Math.max(60 - elapsed, 0);
+      document.getElementById('time').textContent = remaining.toFixed(1);
+      document.getElementById('foreign-word').textContent = currentWord.fr;
+      document.getElementById('translation').textContent = currentWord.en;
+      document.getElementById('control-buttons').style.display = 'none';
+      document.getElementById('timesup').style.display = 'none';
+      document.getElementById('restart-btn').style.display = 'inline-block';
+      playLowPitchDing();
+    }
+
+    function restartQuiz() {
+      document.getElementById('timesup').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'inline-block';
+      document.getElementById('control-buttons').style.display = 'none';
+      document.getElementById('restart-btn').style.display = 'none';
+      countdown = 60.0;
+      document.getElementById('time').textContent = countdown.toFixed(1);
+      document.getElementById('foreign-word').textContent = 'Welcome to Achintya\'s French Spelling Bee Vocabulary Trainer';
+      document.getElementById('translation').textContent = 'Built using HTML, CSS & JavaScript';
+    }
+
+    function updateActiveVocab() {
+      activeVocab = [];
+      if (document.getElementById('stage1').checked) {
+        activeVocab = activeVocab.concat(vocabStage1);
+      }
+      if (document.getElementById('stage2').checked) {
+        activeVocab = activeVocab.concat(vocabStage2);
+      }
+    }
+
+    function showNextWord() {
+      updateActiveVocab();
+      if (activeVocab.length === 0) {
+        window.alert("ERROR: Please select at least one stage.");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * activeVocab.length);
+      currentWord = activeVocab[randomIndex];
+      document.getElementById('foreign-word').textContent = currentWord.fr;
+      document.getElementById('translation').textContent = currentWord.en;
+    }
+
+    function playHighPitchDing() {
+      const audio = new Audio('https://raw.githubusercontent.com/achintyabh/spellingbee/main/start.wav');
+      audio.play();
+    }
+
+    function playLowPitchDing() {
+      const audio = new Audio('https://raw.githubusercontent.com/achintyabh/spellingbee/main/ending.wav');
+      audio.play();
+    }
+  </script>
+</body>
+
+</html>
