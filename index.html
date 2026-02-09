@@ -1,0 +1,222 @@
+<link rel="icon"
+  href="https://shop.towerbridge.org.uk/cdn/shop/files/PawprintMindTheGapRoundelPinBadge2.jpg?v=1728555664&width=1000"
+  type="image/icon type">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Achintya's French Spelling Bee Vocabulary Trainer</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      height: 100%;
+    }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .word {
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+
+    .translation {
+      font-size: 2rem;
+      color: red;
+      margin-bottom: 1rem;
+    }
+
+    #start-btn {
+      margin-bottom: 1rem;
+    }
+
+    #time {
+      font-size: 1.5rem;
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+
+    #tally {
+      font-size: 1.5rem;
+      position: absolute;
+      top: 20px;
+      left: 30px;
+    }
+
+    #timesup {
+      background-color: yellow;
+      padding: 1rem;
+      font-size: 2rem;
+      display: none;
+      position: relative;
+      text-align: center;
+    }
+
+    #restart-btn {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      margin-top: 10px;
+    }
+
+    .center-controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      display: none;
+    }
+
+    .bottom-checkboxes {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="time">60.0</div>
+  <div id="tally">✅ Right: <span id="right-tally">0</span> | ❌ Wrong: <span id="wrong-tally">0</span></div>
+  <div class="word" id="foreign-word">Welcome to Achintya's French Spelling Bee Vocabulary Trainer</div>
+  <div class="translation" id="translation">Built using HTML, CSS & JavaScript</div>
+  <button id="start-btn" onclick="startQuiz()">Start</button>
+  <div class="center-controls" id="control-buttons">
+    <button id="right-btn" onclick="recordRight()">Right</button>
+    <button id="wrong-btn" onclick="recordWrong()">Wrong</button>
+    <button id="stop-btn" onclick="stopQuiz()">Stop</button>
+  </div>
+  <div class="bottom-checkboxes">
+    <label><input type="checkbox" id="stage1"> French Stage 1</label>
+    <label><input type="checkbox" id="stage2"> French Stage 2</label>
+  </div>
+  <div id="timesup">
+    <div>TIME'S UP!</div>
+  </div>
+  <button id="restart-btn" onclick="restartQuiz()" style="display: none;">Restart</button>
+
+  <script>
+    const vocabStage1 = [
+      { fr: "être", en: "to be | being" },
+      { fr: "est", en: "is" },
+      { fr: "français", en: "French" },
+      // Other vocabulary entries
+    ];
+
+    const vocabStage2 = [
+      { fr: "un chien", en: "a dog" },
+      { fr: "la plage", en: "beach" },
+      // Other vocabulary entries
+    ];
+
+    let activeVocab = [];
+    let timer;
+    let countdown = 60.0;
+    let startTime;
+    let currentWord = { fr: '---', en: '---' };
+
+    let rightTally = 0;
+    let wrongTally = 0;
+
+    function startQuiz() {
+      updateActiveVocab();
+      if (activeVocab.length === 0) {
+        window.alert("ERROR: Please select at least one stage.");
+        return;
+      }
+      document.getElementById('timesup').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('control-buttons').style.display = 'flex';
+      document.getElementById('restart-btn').style.display = 'none';
+      countdown = 60.0;
+      document.getElementById('time').textContent = countdown.toFixed(1);
+      showNextWord();
+      clearInterval(timer);
+      startTime = Date.now();
+      timer = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const remaining = Math.max(60 - elapsed, 0);
+        document.getElementById('time').textContent = remaining.toFixed(1);
+        if (remaining <= 0) {
+          clearInterval(timer);
+          document.getElementById('timesup').style.display = 'block';
+          document.getElementById('restart-btn').style.display = 'inline-block';
+          document.getElementById('control-buttons').style.display = 'none';
+        }
+      }, 100);
+    }
+
+    function stopQuiz() {
+      clearInterval(timer);
+      document.getElementById('control-buttons').style.display = 'none';
+      document.getElementById('restart-btn').style.display = 'inline-block';
+    }
+
+    function restartQuiz() {
+      document.getElementById('timesup').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'inline-block';
+      document.getElementById('control-buttons').style.display = 'none';
+      document.getElementById('restart-btn').style.display = 'none';
+      countdown = 60.0;
+      document.getElementById('time').textContent = countdown.toFixed(1);
+    }
+
+    function updateActiveVocab() {
+      activeVocab = [];
+      if (document.getElementById('stage1').checked) {
+        activeVocab = activeVocab.concat(vocabStage1);
+      }
+      if (document.getElementById('stage2').checked) {
+        activeVocab = activeVocab.concat(vocabStage2);
+      }
+    }
+
+    function showNextWord() {
+      if (activeVocab.length === 0) {
+        window.alert("ERROR: Please select at least one stage.");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * activeVocab.length);
+      currentWord = activeVocab[randomIndex];
+      document.getElementById('foreign-word').textContent = currentWord.fr;
+      document.getElementById('translation').textContent = currentWord.en;
+    }
+
+    function recordRight() {
+      rightTally++;
+      document.getElementById('right-tally').textContent = rightTally;
+      showNextWord();
+    }
+
+    function recordWrong() {
+      wrongTally++;
+      document.getElementById('wrong-tally').textContent = wrongTally;
+      showNextWord();
+    }
+  </script>
+</body>
+
+</html>
